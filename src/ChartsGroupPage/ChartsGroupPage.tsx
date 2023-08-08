@@ -48,47 +48,53 @@ export function ChartsGroupPage() {
   }
 
   useLayoutEffect(() => {
-    let tempRes: ChartItem[] = [];
-    readChartsList()
-      .then((res: ChartItem[]) => {
-        setChartsList(res);
-        tempRes = res;
-        // const groupSet: Set<number> = new Set([1]);
-        // const groupObjTemp: GroupObj = {};
-        // res.forEach((item) => {
-        //   groupSet.add(item.group);
-        //   if (groupObjTemp[item.group]) {
-        //     groupObjTemp[item.group].push(item.id);
-        //   } else {
-        //     groupObjTemp[item.group] = [item.id];
-        //   }
-        // });
-        // setGroupObj(groupObjTemp);
-        // setGroupsList(groupSet);
-        // console.log(groupSet, groupSet.size);
-      })
-      .catch((err) => {
-        console.log('ОШИБКА', err);
-        setChartsList(
-          JSON.parse(localStorage.getItem('chartListCache') || '[]')
-        );
-        tempRes = JSON.parse(localStorage.getItem('chartListCache') || '[]');
-      })
-      .finally(() => {
-        const groupSet: Set<number> = new Set([1]);
-        const groupObjTemp: GroupObj = {};
-        tempRes.forEach((item) => {
-          groupSet.add(item.group);
-          if (groupObjTemp[item.group]) {
-            groupObjTemp[item.group].push(item.id);
-          } else {
-            groupObjTemp[item.group] = [item.id];
-          }
-        });
-        setGroupObj(groupObjTemp);
-        setGroupsList(groupSet);
-        console.log(groupSet, groupSet.size);
-      });
+    let tempRes: ChartItem[] = JSON.parse(
+      localStorage.getItem('chartListCache') || '[]'
+    );
+    setChartsList(tempRes);
+
+    const groupSet: Set<number> = new Set([1]);
+    const groupObjTemp: GroupObj = {};
+    tempRes.forEach((item) => {
+      groupSet.add(item.group);
+      if (groupObjTemp[item.group]) {
+        groupObjTemp[item.group].push(item.id);
+      } else {
+        groupObjTemp[item.group] = [item.id];
+      }
+    });
+    setGroupObj(groupObjTemp);
+    setGroupsList(groupSet);
+    console.log(groupSet, groupSet.size);
+
+    // let tempRes: ChartItem[] = [];
+    // readChartsList()
+    //   .then((res: ChartItem[]) => {
+    //     setChartsList(res);
+    //     tempRes = res;
+    //   })
+    //   .catch((err) => {
+    //     console.log('ОШИБКА', err);
+    //     setChartsList(
+    //       JSON.parse(localStorage.getItem('chartListCache') || '[]')
+    //     );
+    //     tempRes = JSON.parse(localStorage.getItem('chartListCache') || '[]');
+    //   })
+    //   .finally(() => {
+    //     const groupSet: Set<number> = new Set([1]);
+    //     const groupObjTemp: GroupObj = {};
+    //     tempRes.forEach((item) => {
+    //       groupSet.add(item.group);
+    //       if (groupObjTemp[item.group]) {
+    //         groupObjTemp[item.group].push(item.id);
+    //       } else {
+    //         groupObjTemp[item.group] = [item.id];
+    //       }
+    //     });
+    //     setGroupObj(groupObjTemp);
+    //     setGroupsList(groupSet);
+    //     console.log(groupSet, groupSet.size);
+    //   });
   }, []);
 
   useEffect(() => {
@@ -151,7 +157,7 @@ export function ChartsGroupPage() {
         tempRes = JSON.parse(
           localStorage.getItem('chartGroupDataCache') || '[]'
         )[groupNum];
-        console.log('ОШИБКА, tempRes=',tempRes)
+        console.log('ОШИБКА, tempRes=', tempRes);
       })
       .finally(() => {
         const dataArr: ChartDataItem[] = [];

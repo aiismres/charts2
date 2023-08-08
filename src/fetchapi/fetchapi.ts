@@ -51,3 +51,17 @@ export function getChartData(id: string) {
       throw new Error(err);
     });
 }
+
+export function getAllChartsData() {
+  return fetch('/api/allChartsData', {
+    method: 'GET',
+    headers: {
+      'Content-Type': 'application/json;charset=utf-8',
+    },
+  })
+    .then((res) => res.json())
+    .catch((err) => {
+      console.log('Error getAllChartsData');
+      throw new Error(err);
+    });
+}

@@ -11,7 +11,7 @@ import {
   XAxis,
 } from 'recharts';
 import dayjs from 'dayjs';
-import { readChartsList } from '../fetchapi/fetchapi';
+import { getAllChartsData, readChartsList } from '../fetchapi/fetchapi';
 import { ChartItem } from '../global';
 import Typography from '@mui/material/Typography';
 import Box from '@mui/material/Box';
@@ -35,6 +35,8 @@ interface Res {
 export function ChartSummPage() {
   const [chartData1, setchartData1] = useState<ChartData[]>([]);
   const [xAxisData, setXAxisData] = useState<string[]>([]);
+  const [isFetchFinish, setIsFetchFinish] = useState(false);
+
   const navigate = useNavigate();
 
   if (!localStorage.chartSummDataCache) {
@@ -43,7 +45,7 @@ export function ChartSummPage() {
 
   useEffect(() => {
     const timer = setInterval(() => {
-      navigate('/chartsgroup');
+      if (isFetchFinish) navigate('/chartsgroup');
     }, GRAPH_INTERVAL);
     // clearing interval
     return () => clearInterval(timer);
@@ -66,44 +68,44 @@ export function ChartSummPage() {
     console.log({ dateArr });
     setXAxisData(dateArr);
 
-    // fetch('http://localhost:3001/api/allChartsData', {
-    fetch('/api/allChartsData', {
-      method: 'GET',
-      headers: {
-        'Content-Type': 'application/json;charset=utf-8',
-      },
-    })
-      .then((res) => res.json())
+    // fetch('/api/allChartsData', {
+    //   method: 'GET',
+    //   headers: {
+    //     'Content-Type': 'application/json;charset=utf-8',
+    //   },
+    // })
+    getAllChartsData()
+      // .then((res) => res.json())
       .then((res: Res[]) => {
         console.log('res1', res);
-        let daySumV = 0;
-        let sumVArr: ChartData[] = [];
-        let date = res[0].DT.substring(0, 13);
-        console.log(date);
-        res.forEach((item, i) => {
-          if (item.DT.substring(0, 13) === date) {
-            daySumV += item.Val;
-          } else {
-            sumVArr.push({ v: daySumV, date2: item.DT });
-            daySumV = 0;
-            date = item.DT.substring(0, 13);
-          }
-        });
-        while (sumVArr.length < 360) {
-          sumVArr.push({ v: 0 });
-        }
-        setchartData1(addDate(sumVArr, dateArr));
-        localStorage.setItem('chartSummDataCache', JSON.stringify(sumVArr));
+        // let daySumV = 0;
+        // let sumVArr: ChartData[] = [];
+        // let date = res[0].DT.substring(0, 13);
+        // console.log(date);
+        // res.forEach((item, i) => {
+        //   if (item.DT.substring(0, 13) === date) {
+        //     daySumV += item.Val;
+        //   } else {
+        //     sumVArr.push({ v: daySumV, date2: item.DT });
+        //     daySumV = 0;
+        //     date = item.DT.substring(0, 13);
+        //   }
+        // });
+        // while (sumVArr.length < 360) {
+        //   sumVArr.push({ v: 0 });
+        // }
+        const sumVArr2 = makeSummArr(res);
+        setchartData1(addDate(sumVArr2, dateArr));
+        localStorage.setItem('chartSummDataCache', JSON.stringify(sumVArr2));
       })
       .catch(() => {
         console.log('ОШИБКА');
-        setchartData1(
-          addDate(
-            JSON.parse(localStorage.getItem('chartSummDataCache') || '[]'),
-            dateArr
-          )
+        const sumVArr2 = JSON.parse(
+          localStorage.getItem('chartSummDataCache') || '[]'
         );
-      });
+        setchartData1(addDate(sumVArr2, dateArr));
+      })
+      .finally(() => setIsFetchFinish(true));
   }, []);
 
   function addDate(arr: ChartData[], dateArr2: string[]) {
@@ -115,6 +117,26 @@ export function ChartSummPage() {
         return { ...item };
       }
     });
+  }
+
+  function makeSummArr(data: Res[]) {
+    let daySumV = 0;
+    let sumVArr: ChartData[] = [];
+    let date = data[0].DT.substring(0, 13);
+    console.log(date);
+    data.forEach((item, i) => {
+      if (item.DT.substring(0, 13) === date) {
+        daySumV += item.Val;
+      } else {
+        sumVArr.push({ v: daySumV, date2: item.DT });
+        daySumV = 0;
+        date = item.DT.substring(0, 13);
+      }
+    });
+    while (sumVArr.length < 360) {
+      sumVArr.push({ v: 0 });
+    }
+    return sumVArr;
   }
 
   return (

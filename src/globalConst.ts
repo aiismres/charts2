@@ -1,4 +1,4 @@
-export const GRAPH_INTERVAL = 10000;
+export const GRAPH_INTERVAL = 5000;
 export const TICK_FONT_SIZE = '1.2rem';
 
 export const COLORS_ARR = [
