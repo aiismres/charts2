@@ -21,9 +21,10 @@ import { Navigate } from 'react-router-dom';
 import { useNavigate } from 'react-router-dom';
 import { GRAPH_INTERVAL, TICK_FONT_SIZE } from '../globalConst';
 import { produce } from 'immer';
+import { StatusBlock } from '../StatusBlock';
 // import './styles.css';
 
-interface ChartData {
+export interface ChartData {
   v: number;
   date2?: string;
 }
@@ -35,52 +36,50 @@ export function Charts2Page() {
   const [chartsList, setChartsList] = useState<ChartItem[]>([]);
   const [chartN, setChartN] = useState(0);
   const [chartName, setChartName] = useState({ nameCh1: '', nameCh2: '' });
-  const [isFetchFinish, setIsFetchFinish] = useState(false);
-  const [isServerError, setIsServerError] = useState(false);
+  // const [isFetchFinish, setIsFetchFinish] = useState(false);
+  // const [isServerError, setIsServerError] = useState(false);
+  const [isServerRes, setIsServerRes] = useState(true);
   // const [chartDataCache, setChartDataCache] = useState<Array<ChartData[]>>([]);
   const navigate = useNavigate();
 
-  if (!localStorage.chartDataCache) {
-    localStorage.setItem('chartDataCache', JSON.stringify([]));
-  }
-  if (!localStorage.chartListCache) {
-    localStorage.setItem('chartListCache', JSON.stringify([]));
-  }
+  // if (!localStorage.chartDataCache) {
+  //   localStorage.setItem('chartDataCache', JSON.stringify([]));
+  // }
+  // if (!localStorage.chartListCache) {
+  //   localStorage.setItem('chartListCache', JSON.stringify([]));
+  // }
 
   useLayoutEffect(() => {
-    setChartsList(JSON.parse(localStorage.getItem('chartListCache') || '[]'));
-
-    // readChartsList()
-    //   .then((res) => {
-    //     setChartsList(res);
-    //     console.log('readChartsList() res=', res);
-    //     localStorage.setItem('chartListCache', JSON.stringify(res));
-    //   })
-    //   .catch(() => {
-    //     console.log('ОШИБКА сервера ChartsList');
-    //     setChartsList(
-    //       JSON.parse(localStorage.getItem('chartListCache') || '[]')
-    //     );
-    //   });
+    const charsList = JSON.parse(
+      localStorage.getItem('chartListCache') || '[]'
+    );
+    if (!charsList[0]) {
+      window.location.replace('/');
+    }
+    console.log('charsList', charsList);
+    setChartsList(charsList);
   }, []);
 
   useEffect(() => {
     const timer = setInterval(() => {
-      if (isFetchFinish) {
-        setIsFetchFinish(false);
-
-        // setChartN((n) => (chartsList[chartN + 2] ? n + 2 : 0));
-
-        if (chartsList[chartN + 2]) {
-          setChartN((n) => n + 2);
-        } else {
-          navigate('/chartsumm');
-        }
+      console.log('setInterval', chartsList);
+      // setChartN((n) => (chartsList[n + 2] ? n + 2 : 0));
+      // if (!isServerRes) {
+      //   setIsServerError(true);
+      // } else {
+      //   setIsServerError(false);
+      // }
+      if (chartsList[chartN + 2]) {
+        console.log('if (chartsList[chartN + 2])', chartsList[chartN + 2]);
+        setChartN((n) => n + 2);
+      } else {
+        console.log('else');
+        navigate('/chartsumm');
       }
     }, GRAPH_INTERVAL);
     // clearing interval
     return () => clearInterval(timer);
-  });
+  }, [chartsList, chartN]);
 
   useEffect(() => {
     // *****************
@@ -100,6 +99,21 @@ export function Charts2Page() {
     setXAxisData(dateArr);
 
     // *****************
+    let chartDataCache: Array<ChartData[]> = JSON.parse(
+      localStorage.getItem('chartDataCache') || '[]'
+    );
+
+    console.log({ chartDataCache });
+    setChartData1(addDate(chartDataCache[chartN], dateArr));
+    if (chartDataCache[chartN + 1]) {
+      setChartData2(addDate(chartDataCache[chartN + 1], dateArr));
+    }
+    setChartName((st) => ({
+      ...st,
+      nameCh1: chartsList[chartN]?.name,
+      nameCh2: chartsList[chartN + 1]?.name,
+    }));
+    // *****************
 
     Promise.all([
       getChartData(chartsList[chartN]?.id),
@@ -107,100 +121,42 @@ export function Charts2Page() {
     ])
       .then((res) => {
         console.log('asdf', res);
-        setChartData1(addDate(res[0], dateArr));
-        setChartData2(addDate(res[1], dateArr));
+        // setChartData1(addDate(res[0], dateArr));
+        // setChartData2(addDate(res[1], dateArr));
         let chartDataCache: Array<ChartData[]> = JSON.parse(
           localStorage.getItem('chartDataCache') || '[]'
         );
         chartDataCache[chartN] = res[0];
         chartDataCache[chartN + 1] = res[1];
         localStorage.setItem('chartDataCache', JSON.stringify(chartDataCache));
-        setIsServerError(false);
+        // setIsServerError(false);
+        setIsServerRes(true);
+        localStorage.setItem('isServerError', JSON.stringify(''));
       })
       .catch((err) => {
         console.log('new Error12!!', err);
-        setIsServerError(true);
-        let chartDataCache: Array<ChartData[]> = JSON.parse(
-          localStorage.getItem('chartDataCache') || '[]'
+        // setIsServerError(true);
+        localStorage.setItem(
+          'isServerError',
+          JSON.stringify('server needs care')
         );
-        setChartData1(addDate(chartDataCache[chartN], dateArr));
-        setChartData2(addDate(chartDataCache[chartN + 1], dateArr));
+
+        // let chartDataCache: Array<ChartData[]> = JSON.parse(
+        //   localStorage.getItem('chartDataCache') || '[]'
+        // );
+        // setChartData1(addDate(chartDataCache[chartN], dateArr));
+        // setChartData2(addDate(chartDataCache[chartN + 1], dateArr));
       })
       .finally(() => {
-        setChartName((st) => ({
-          ...st,
-          nameCh1: chartsList[chartN]?.name,
-          nameCh2: chartsList[chartN + 1]?.name,
-        }));
-        setIsFetchFinish(true);
+        // setChartName((st) => ({
+        //   ...st,
+        //   nameCh1: chartsList[chartN]?.name,
+        //   nameCh2: chartsList[chartN + 1]?.name,
+        // }));
+        // setIsFetchFinish(true);
       });
 
     // *****************
-    // fetch('/api/chartData', {
-    //   method: 'POST',
-    //   headers: {
-    //     'Content-Type': 'application/json;charset=utf-8',
-    //   },
-    //   body: JSON.stringify({ ID_PP: chartsList[chartN]?.id }),
-    // })
-    //   .then((res) => {
-    // if (!res.ok) {
-    //   throw new Error('ошибка сервера');
-    // }
-    // return res.json();
-    // })
-    // .then((res) => {
-    // console.log('res1', res);
-    // setChartData1(addDate(res, dateArr));
-    // let chartDataCache: Array<ChartData[]> = JSON.parse(
-    //   localStorage.getItem('chartDataCache') || '[]'
-    // );
-    // chartDataCache[chartN] = res;
-    // console.log('chartDataCache', chartDataCache);
-    // localStorage.setItem('chartDataCache', JSON.stringify(chartDataCache));
-    // })
-    // .catch((err) => {
-    // console.log('ОШИБКА', err);
-    // let chartDataCache: Array<ChartData[]> = JSON.parse(
-    //   localStorage.getItem('chartDataCache') || '[]'
-    // );
-    // setChartData1(addDate(chartDataCache[chartN], dateArr));
-    // })
-    // .finally(() => {
-    // setChartName((st) => ({
-    //   ...st,
-    //   nameCh1: chartsList[chartN]?.name,
-    //   nameCh2: chartsList[chartN + 1]?.name,
-    // }));
-    // setIsFetchFinish(true);
-    // });
-
-    // fetch('/api/chartData', {
-    //   method: 'POST',
-    //   headers: {
-    //     'Content-Type': 'application/json;charset=utf-8',
-    //   },
-    //   body: JSON.stringify({ ID_PP: chartsList[chartN + 1]?.id }),
-    // })
-    //   .then((res) => res.json())
-    //   .then((res) => {
-    //     console.log('res2', res);
-    // setChartData2(addDate(res, dateArr));
-
-    // let chartDataCache: Array<ChartData[]> = JSON.parse(
-    //   localStorage.getItem('chartDataCache') || '[]'
-    // );
-    // chartDataCache[chartN + 1] = res;
-    // console.log('chartDataCache', chartDataCache);
-    // localStorage.setItem('chartDataCache', JSON.stringify(chartDataCache));
-    // })
-    // .catch((err) => {
-    // console.log('ОШИБКА', err);
-    // let chartDataCache: Array<ChartData[]> = JSON.parse(
-    //   localStorage.getItem('chartDataCache') || '[]'
-    // );
-    // setChartData2(addDate(chartDataCache[chartN + 1], dateArr));
-    // });
   }, [chartsList, chartN]);
 
   function addDate(arr: ChartData[], dateArr2: string[]) {
@@ -227,7 +183,7 @@ export function Charts2Page() {
             }}
             key={chartName.nameCh1}
           >
-            <Typography variant='h4' align='center'>
+            <Typography variant='h4' align='center' minHeight={40}>
               {chartName.nameCh1}
             </Typography>
           </CSSTransition>
@@ -276,8 +232,9 @@ export function Charts2Page() {
             <CartesianGrid />
           </BarChart>
         </ResponsiveContainer>
-        <div>{isServerError && 'server needs care'}</div>
+        {/* <div>{isServerError && 'server needs care'}</div> */}
       </Box>
+      <StatusBlock />
     </>
   );
 }

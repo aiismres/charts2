@@ -12,7 +12,7 @@ import {
   Legend,
 } from 'recharts';
 import dayjs from 'dayjs';
-import { readChartsList } from '../fetchapi/fetchapi';
+import { getChartsGroupData, readChartsList } from '../fetchapi/fetchapi';
 import { ChartItem } from '../global';
 import Typography from '@mui/material/Typography';
 import Box from '@mui/material/Box';
@@ -21,8 +21,9 @@ import { SwitchTransition, CSSTransition } from 'react-transition-group';
 import { COLORS_ARR, GRAPH_INTERVAL } from '../globalConst';
 import { useNavigate } from 'react-router-dom';
 import { error } from 'console';
+import { StatusBlock } from '../StatusBlock';
 
-interface Res {
+export interface Res {
   ID_PP: number;
   DT: string;
   Val: number;
@@ -30,7 +31,7 @@ interface Res {
 interface ChartDataItem {
   [k: string]: number | string;
 }
-interface GroupObj {
+export interface GroupObj {
   [k: string]: string[];
 }
 
@@ -128,25 +129,59 @@ export function ChartsGroupPage() {
     console.log({ dateArr });
     setXAxisData(dateArr);
 
-    let tempRes: Res[] = [];
-    // fetch('http://localhost:3001/api/chartsGroupData', {
-    fetch('/api/chartsGroupData', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json;charset=utf-8',
-      },
-      body: JSON.stringify({ group: groupNum }),
-    })
-      .then((res) => {
-        console.log('res', res);
-        if (!res.ok) {
-          throw new Error('Ошибка сервера');
+    let tempRes: Res[] = JSON.parse(
+      localStorage.getItem('chartGroupDataCache') || '[]'
+    )[groupNum];
+    if (!tempRes) {
+      console.log('ОШИБКА, tempRes=', tempRes);
+      window.location.replace('/');
+    }
+    const dataArr: ChartDataItem[] = [];
+    tempRes.forEach((item) => {
+      const length = dataArr.length;
+
+      if (
+        dataArr[length - 1] &&
+        item.DT.substring(0, 13) === dataArr[length - 1].date2
+      ) {
+        if (dataArr[length - 1][item.ID_PP]) {
+          dataArr[length - 1][item.ID_PP] =
+            Number(dataArr[length - 1][item.ID_PP]) + item.Val;
+        } else {
+          dataArr[length - 1][item.ID_PP] = item.Val;
         }
-        return res.json();
-      })
+      } else {
+        dataArr.push({
+          date2: item.DT.substring(0, 13),
+          [item.ID_PP]: item.Val,
+        });
+      }
+    });
+
+    while (dataArr.length < 360) {
+      dataArr.push({});
+    }
+
+    setchartData1(addDate(dataArr, dateArr));
+
+    // fetch('/api/chartsGroupData', {
+    //   method: 'POST',
+    //   headers: {
+    //     'Content-Type': 'application/json;charset=utf-8',
+    //   },
+    //   body: JSON.stringify({ group: groupNum }),
+    // })
+    //   .then((res) => {
+    //     console.log('res', res);
+    //     if (!res.ok) {
+    //       throw new Error('Ошибка сервера');
+    //     }
+    //     return res.json();
+    //   })
+    getChartsGroupData(groupNum)
       .then((res: Res[]) => {
         console.log('res1', res);
-        tempRes = res;
+        // tempRes = res;
         let tempChGDC = JSON.parse(
           localStorage.getItem('chartGroupDataCache') || '[]'
         );
@@ -154,39 +189,36 @@ export function ChartsGroupPage() {
         localStorage.setItem('chartGroupDataCache', JSON.stringify(tempChGDC));
       })
       .catch((err) => {
-        tempRes = JSON.parse(
-          localStorage.getItem('chartGroupDataCache') || '[]'
-        )[groupNum];
-        console.log('ОШИБКА, tempRes=', tempRes);
+        // tempRes = JSON.parse(
+        //   localStorage.getItem('chartGroupDataCache') || '[]'
+        // )[groupNum];
+        // console.log('ОШИБКА, tempRes=', tempRes);
       })
       .finally(() => {
-        const dataArr: ChartDataItem[] = [];
-        tempRes.forEach((item) => {
-          const length = dataArr.length;
-
-          if (
-            dataArr[length - 1] &&
-            item.DT.substring(0, 13) === dataArr[length - 1].date2
-          ) {
-            if (dataArr[length - 1][item.ID_PP]) {
-              dataArr[length - 1][item.ID_PP] =
-                Number(dataArr[length - 1][item.ID_PP]) + item.Val;
-            } else {
-              dataArr[length - 1][item.ID_PP] = item.Val;
-            }
-          } else {
-            dataArr.push({
-              date2: item.DT.substring(0, 13),
-              [item.ID_PP]: item.Val,
-            });
-          }
-        });
-
-        while (dataArr.length < 360) {
-          dataArr.push({});
-        }
-
-        setchartData1(addDate(dataArr, dateArr));
+        // const dataArr: ChartDataItem[] = [];
+        // tempRes.forEach((item) => {
+        //   const length = dataArr.length;
+        //   if (
+        //     dataArr[length - 1] &&
+        //     item.DT.substring(0, 13) === dataArr[length - 1].date2
+        //   ) {
+        //     if (dataArr[length - 1][item.ID_PP]) {
+        //       dataArr[length - 1][item.ID_PP] =
+        //         Number(dataArr[length - 1][item.ID_PP]) + item.Val;
+        //     } else {
+        //       dataArr[length - 1][item.ID_PP] = item.Val;
+        //     }
+        //   } else {
+        //     dataArr.push({
+        //       date2: item.DT.substring(0, 13),
+        //       [item.ID_PP]: item.Val,
+        //     });
+        //   }
+        // });
+        // while (dataArr.length < 360) {
+        //   dataArr.push({});
+        // }
+        // setchartData1(addDate(dataArr, dateArr));
       });
   }, [chartsList, groupNum, groupsList]);
 
@@ -240,23 +272,22 @@ export function ChartsGroupPage() {
                 dot={false}
               />
             ))}
-
-            <Legend
-              payload={groupObj[groupNum]?.map((item, i) => ({
-                id: item,
-                type: 'square',
-                value: chartsList.find((item2) => item2.id === item)?.name,
-                color: COLORS_ARR[i],
-              }))}
-            />
           </LineChart>
         </ResponsiveContainer>
-
+        <Legend
+          payload={groupObj[groupNum]?.map((item, i) => ({
+            id: item,
+            type: 'square',
+            value: chartsList.find((item2) => item2.id === item)?.name,
+            color: COLORS_ARR[i],
+          }))}
+        />
         {/* <ul>
           {COLORS_ARR.map((item, i) => (
             <li style={{ color: item }}>{i + item + '----------------'}</li>
           ))}
         </ul> */}
+        <StatusBlock />
       </Box>
     </>
   );

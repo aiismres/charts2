@@ -47,9 +47,9 @@ function dateFromTo() {
 app.post('/api/chartData', async ({ body: { ID_PP } }, res) => {
   console.log('/api/chartData', ID_PP);
   try {
-      let todayStr = new Date().toISOString().split('T')[0];
-      let date = new Date();
-      date.setDate(date.getDate() - 14);
+    let todayStr = new Date().toISOString().split('T')[0];
+    let date = new Date();
+    date.setDate(date.getDate() - 14);
     let dateStr = date.toISOString().split('T')[0];
     const result = await sql.query`select Val, DT from PointMains where DT >= ${
       dateStr + ' 00:00:00'
@@ -59,7 +59,7 @@ app.post('/api/chartData', async ({ body: { ID_PP } }, res) => {
     const enPerHourArr = [];
     let enPerHour = 0;
     let date2;
-    
+
     result.recordset.forEach((item, i) => {
       if (i % 2 === 0) {
         enPerHour = item.Val;
@@ -92,7 +92,8 @@ app.post('/api/chartData', async ({ body: { ID_PP } }, res) => {
     res.json(enPerHourArr);
   } catch (err) {
     console.log(err);
-    res.send(err)}
+    res.status(500).send(err);
+  }
 });
 
 app.get('/api/chartsList', async (req, res) => {

@@ -19,6 +19,7 @@ import Fade from '@mui/material/Fade';
 import { SwitchTransition, CSSTransition } from 'react-transition-group';
 import { useNavigate } from 'react-router-dom';
 import { GRAPH_INTERVAL } from '../globalConst';
+import { StatusBlock } from '../StatusBlock';
 
 interface ChartData {
   v: number;
@@ -26,7 +27,7 @@ interface ChartData {
   date2?: string;
 }
 
-interface Res {
+export interface Res {
   ID_PP: number;
   DT: string;
   Val: number;
@@ -35,7 +36,7 @@ interface Res {
 export function ChartSummPage() {
   const [chartData1, setchartData1] = useState<ChartData[]>([]);
   const [xAxisData, setXAxisData] = useState<string[]>([]);
-  const [isFetchFinish, setIsFetchFinish] = useState(false);
+  // const [isFetchFinish, setIsFetchFinish] = useState(false);
 
   const navigate = useNavigate();
 
@@ -45,7 +46,7 @@ export function ChartSummPage() {
 
   useEffect(() => {
     const timer = setInterval(() => {
-      if (isFetchFinish) navigate('/chartsgroup');
+      navigate('/chartsgroup');
     }, GRAPH_INTERVAL);
     // clearing interval
     return () => clearInterval(timer);
@@ -68,75 +69,39 @@ export function ChartSummPage() {
     console.log({ dateArr });
     setXAxisData(dateArr);
 
-    // fetch('/api/allChartsData', {
-    //   method: 'GET',
-    //   headers: {
-    //     'Content-Type': 'application/json;charset=utf-8',
-    //   },
-    // })
+    // *******************
+    const sumVArr2 = JSON.parse(
+      localStorage.getItem('chartSummDataCache') || '[]'
+    );
+    setchartData1(addDate(sumVArr2, dateArr));
+    // *****************
+
     getAllChartsData()
-      // .then((res) => res.json())
       .then((res: Res[]) => {
         console.log('res1', res);
-        // let daySumV = 0;
-        // let sumVArr: ChartData[] = [];
-        // let date = res[0].DT.substring(0, 13);
-        // console.log(date);
-        // res.forEach((item, i) => {
-        //   if (item.DT.substring(0, 13) === date) {
-        //     daySumV += item.Val;
-        //   } else {
-        //     sumVArr.push({ v: daySumV, date2: item.DT });
-        //     daySumV = 0;
-        //     date = item.DT.substring(0, 13);
-        //   }
-        // });
-        // while (sumVArr.length < 360) {
-        //   sumVArr.push({ v: 0 });
-        // }
+
         const sumVArr2 = makeSummArr(res);
-        setchartData1(addDate(sumVArr2, dateArr));
+        // setchartData1(addDate(sumVArr2, dateArr));
         localStorage.setItem('chartSummDataCache', JSON.stringify(sumVArr2));
       })
       .catch(() => {
         console.log('ОШИБКА');
-        const sumVArr2 = JSON.parse(
-          localStorage.getItem('chartSummDataCache') || '[]'
-        );
-        setchartData1(addDate(sumVArr2, dateArr));
-      })
-      .finally(() => setIsFetchFinish(true));
+        // const sumVArr2 = JSON.parse(
+        //   localStorage.getItem('chartSummDataCache') || '[]'
+        // );
+        // setchartData1(addDate(sumVArr2, dateArr));
+      });
+    // .finally(() => setIsFetchFinish(true));
   }, []);
 
   function addDate(arr: ChartData[], dateArr2: string[]) {
     return arr.map((item, i) => {
-      // console.log(dateArr2[i]);
       if (i % 24 === 0) {
         return { ...item, date: dateArr2[i / 24] };
       } else {
         return { ...item };
       }
     });
-  }
-
-  function makeSummArr(data: Res[]) {
-    let daySumV = 0;
-    let sumVArr: ChartData[] = [];
-    let date = data[0].DT.substring(0, 13);
-    console.log(date);
-    data.forEach((item, i) => {
-      if (item.DT.substring(0, 13) === date) {
-        daySumV += item.Val;
-      } else {
-        sumVArr.push({ v: daySumV, date2: item.DT });
-        daySumV = 0;
-        date = item.DT.substring(0, 13);
-      }
-    });
-    while (sumVArr.length < 360) {
-      sumVArr.push({ v: 0 });
-    }
-    return sumVArr;
   }
 
   return (
@@ -164,7 +129,28 @@ export function ChartSummPage() {
             <CartesianGrid />
           </BarChart>
         </ResponsiveContainer>
+        <StatusBlock />
       </Box>
     </>
   );
+}
+
+export function makeSummArr(data: Res[]) {
+  let daySumV = 0;
+  let sumVArr: ChartData[] = [];
+  let date = data[0].DT.substring(0, 13);
+  console.log(date);
+  data.forEach((item, i) => {
+    if (item.DT.substring(0, 13) === date) {
+      daySumV += item.Val;
+    } else {
+      sumVArr.push({ v: daySumV, date2: item.DT });
+      daySumV = 0;
+      date = item.DT.substring(0, 13);
+    }
+  });
+  while (sumVArr.length < 360) {
+    sumVArr.push({ v: 0 });
+  }
+  return sumVArr;
 }

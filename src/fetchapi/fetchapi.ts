@@ -45,7 +45,13 @@ export function getChartData(id: string) {
     },
     body: JSON.stringify({ ID_PP: id }),
   })
-    .then((res) => res.json())
+    .then((res) => {
+      if (res.ok) {
+        return res.json();
+      } else {
+        throw new Error();
+      }
+    })
     .catch((err) => {
       console.log('Error getChartData');
       throw new Error(err);
@@ -59,7 +65,34 @@ export function getAllChartsData() {
       'Content-Type': 'application/json;charset=utf-8',
     },
   })
-    .then((res) => res.json())
+    .then((res) => {
+      if (res.ok) {
+        return res.json();
+      } else {
+        throw new Error();
+      }
+    })
+    .catch((err) => {
+      console.log('Error getAllChartsData');
+      throw new Error(err);
+    });
+}
+
+export function getChartsGroupData(groupNum: number) {
+  return fetch('/api/chartsGroupData', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json;charset=utf-8',
+    },
+    body: JSON.stringify({ group: groupNum }),
+  })
+    .then((res) => {
+      if (res.ok) {
+        return res.json();
+      } else {
+        throw new Error();
+      }
+    })
     .catch((err) => {
       console.log('Error getAllChartsData');
       throw new Error(err);

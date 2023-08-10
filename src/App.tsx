@@ -7,12 +7,19 @@ import { Admin } from './Admin';
 import { Charts2Page } from './Charts2Page';
 import { ChartSummPage } from './ChartSummPage';
 import { ChartsGroupPage } from './ChartsGroupPage';
+import { DataLoadPage } from './DataLoadPage';
 
 function App() {
+  if (!localStorage.chartDataCache) {
+    localStorage.setItem('chartDataCache', JSON.stringify([]));
+  }
+  if (!localStorage.chartListCache) {
+    localStorage.setItem('chartListCache', JSON.stringify([]));
+  }
   return (
     <BrowserRouter>
       <Routes>
-        <Route path='/' element={<Charts />} />
+        <Route path='/' element={<DataLoadPage />} />
         <Route path='/charts2' element={<Charts2Page />} />
         <Route path='/chartsumm' element={<ChartSummPage />} />
         <Route path='/chartsgroup' element={<ChartsGroupPage />} />
