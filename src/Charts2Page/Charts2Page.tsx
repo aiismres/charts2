@@ -22,6 +22,7 @@ import { useNavigate } from 'react-router-dom';
 import { GRAPH_INTERVAL, TICK_FONT_SIZE } from '../globalConst';
 import { produce } from 'immer';
 import { StatusBlock } from '../StatusBlock';
+import { Layout } from '../Layout';
 // import './styles.css';
 
 export interface ChartData {
@@ -58,6 +59,14 @@ export function Charts2Page() {
     }
     console.log('charsList', charsList);
     setChartsList(charsList);
+  }, []);
+
+  useEffect(() => {
+    console.log(' readChartsList().then');
+    readChartsList().then((res) => {
+      console.log(res);
+      localStorage.setItem('chartListCache', JSON.stringify(res));
+    });
   }, []);
 
   useEffect(() => {
@@ -104,7 +113,9 @@ export function Charts2Page() {
     );
 
     console.log({ chartDataCache });
-    setChartData1(addDate(chartDataCache[chartN], dateArr));
+    if (chartDataCache[chartN]) {
+      setChartData1(addDate(chartDataCache[chartN], dateArr));
+    }
     if (chartDataCache[chartN + 1]) {
       setChartData2(addDate(chartDataCache[chartN + 1], dateArr));
     }
@@ -170,71 +181,73 @@ export function Charts2Page() {
   }
 
   return (
-    <>
-      <Box paddingTop={5}>
-        {/* <Typography variant='h4' align='center'>
+    // <>
+    // <Layout>
+    <Box padding={5}>
+      {/* <Typography variant='h4' align='center'>
           {chartName.nameCh1}
         </Typography> */}
-        <SwitchTransition mode='out-in'>
-          <CSSTransition
-            classNames='fade'
-            addEndListener={(node, done) => {
-              node.addEventListener('transitionend', done, false);
+      <SwitchTransition mode='out-in'>
+        <CSSTransition
+          classNames='fade'
+          addEndListener={(node, done) => {
+            node.addEventListener('transitionend', done, false);
+          }}
+          key={chartName.nameCh1}
+        >
+          <Typography variant='h4' align='center' minHeight={40}>
+            {chartName.nameCh1}
+          </Typography>
+        </CSSTransition>
+      </SwitchTransition>
+
+      <ResponsiveContainer width='100%' height={400}>
+        <BarChart width={1780} height={400} data={chartData1}>
+          <Bar dataKey='v' fill='#8884d8' />
+          <YAxis
+            type='number'
+            domain={[0, 'auto']}
+            tickFormatter={(tick) => {
+              return tick.toLocaleString();
             }}
-            key={chartName.nameCh1}
-          >
-            <Typography variant='h4' align='center' minHeight={40}>
-              {chartName.nameCh1}
-            </Typography>
-          </CSSTransition>
-        </SwitchTransition>
+            style={{
+              fontSize: TICK_FONT_SIZE,
 
-        <ResponsiveContainer width='100%' height={400}>
-          <BarChart width={1780} height={400} data={chartData1}>
-            <Bar dataKey='v' fill='#8884d8' />
-            <YAxis
-              type='number'
-              domain={[0, 'auto']}
-              tickFormatter={(tick) => {
-                return tick.toLocaleString();
-              }}
-              style={{
-                fontSize: TICK_FONT_SIZE,
-
-                // fontFamily: 'Arial',
-              }}
-            />
-            <XAxis dataKey='date' ticks={xAxisData} dx={57} />
-            <CartesianGrid />
-          </BarChart>
-        </ResponsiveContainer>
-        <br />
-        <SwitchTransition mode='out-in'>
-          <CSSTransition
-            classNames='fade'
-            addEndListener={(node, done) => {
-              node.addEventListener('transitionend', done, false);
+              // fontFamily: 'Arial',
             }}
-            key={chartName.nameCh2}
-          >
-            <Typography variant='h4' align='center' minHeight={40}>
-              {chartName.nameCh2}
-            </Typography>
-          </CSSTransition>
-        </SwitchTransition>
+          />
+          <XAxis dataKey='date' ticks={xAxisData} dx={57} />
+          <CartesianGrid />
+        </BarChart>
+      </ResponsiveContainer>
+      <br />
+      <SwitchTransition mode='out-in'>
+        <CSSTransition
+          classNames='fade'
+          addEndListener={(node, done) => {
+            node.addEventListener('transitionend', done, false);
+          }}
+          key={chartName.nameCh2}
+        >
+          <Typography variant='h4' align='center' minHeight={40}>
+            {chartName.nameCh2}
+          </Typography>
+        </CSSTransition>
+      </SwitchTransition>
 
-        {/* <ResponsiveContainer width='100%' height='100%'> */}
-        <ResponsiveContainer width='100%' height={400}>
-          <BarChart width={1780} height={400} data={chartData2}>
-            <Bar dataKey='v' fill='red' />
-            <YAxis type='number' domain={[0, 'auto']} />
-            <XAxis dataKey='date' ticks={xAxisData} dx={57} />
-            <CartesianGrid />
-          </BarChart>
-        </ResponsiveContainer>
-        {/* <div>{isServerError && 'server needs care'}</div> */}
-      </Box>
+      {/* <ResponsiveContainer width='100%' height='100%'> */}
+      <ResponsiveContainer width='100%' height={400}>
+        <BarChart width={1780} height={400} data={chartData2}>
+          <Bar dataKey='v' fill='red' />
+          <YAxis type='number' domain={[0, 'auto']} />
+          <XAxis dataKey='date' ticks={xAxisData} dx={57} />
+          <CartesianGrid />
+        </BarChart>
+      </ResponsiveContainer>
+      {/* <div>{isServerError && 'server needs care'}</div> */}
       <StatusBlock />
-    </>
+    </Box>
+    // </Layout>
+    // </>
   );
 }

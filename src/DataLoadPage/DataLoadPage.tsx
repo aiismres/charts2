@@ -63,6 +63,14 @@ export function DataLoadPage() {
   return (
     <>
       <h2>Загрузка данных</h2>
+      <ul>
+        <li>
+          <a href='/charts2'>Графики</a>
+        </li>
+        <li>
+          <a href='/admin'>Админка</a>
+        </li>
+      </ul>
     </>
   );
 }

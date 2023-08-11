@@ -13,7 +13,7 @@ export function readChartsList() {
     if (res.ok) {
       return res.json();
     } else {
-      return new Error('Ошибка readChartsList()');
+      throw new Error('Ошибка readChartsList()');
     }
   });
 }
