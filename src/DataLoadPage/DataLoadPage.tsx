@@ -70,6 +70,9 @@ export function DataLoadPage() {
         <li>
           <a href='/admin'>Админка</a>
         </li>
+        <li>
+          <a href='/chartvertbar'>Вертикальные</a>
+        </li>
       </ul>
     </>
   );

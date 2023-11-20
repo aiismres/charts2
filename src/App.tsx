@@ -8,6 +8,7 @@ import { Charts2Page } from './Charts2Page';
 import { ChartSummPage } from './ChartSummPage';
 import { ChartsGroupPage } from './ChartsGroupPage';
 import { DataLoadPage } from './DataLoadPage';
+import { ChartVertBar } from './ChartVertBar';
 
 function App() {
   if (!localStorage.chartDataCache) {
@@ -24,6 +25,7 @@ function App() {
         <Route path='/chartsumm' element={<ChartSummPage />} />
         <Route path='/chartsgroup' element={<ChartsGroupPage />} />
         <Route path='/admin' element={<Admin />} />
+        <Route path='/chartvertbar' element={<ChartVertBar />} />
       </Routes>
     </BrowserRouter>
   );
