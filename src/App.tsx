@@ -10,6 +10,15 @@ import { ChartsGroupPage } from './ChartsGroupPage';
 import { DataLoadPage } from './DataLoadPage';
 import { ChartVertBar } from './ChartVertBar';
 
+const routes = [
+  { id: 1, path: '/', name: 'Загрузка данных и карта сайта' },
+  { id: 2, path: '/charts2', name: 'Графики потребления пообъектно' },
+  { id: 3, path: '/chartsumm', name: 'График суммарного потребления ГЭС' },
+  { id: 4, path: '/chartsgroup', name: 'Групповые графики' },
+  { id: 5, path: '/admin', name: 'Настройка графиков' },
+  { id: 6, path: '/chartvertbar', name: 'Горизонтальные бар чарт' },
+];
+
 function App() {
   if (!localStorage.chartDataCache) {
     localStorage.setItem('chartDataCache', JSON.stringify([]));
