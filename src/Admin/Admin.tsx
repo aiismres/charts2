@@ -20,6 +20,8 @@ import Input from '@mui/material/Input';
 import { ChartListItem } from '../ChartListItem';
 import { readChartsList, updChartsList } from '../fetchapi/fetchapi';
 import { ChartItem } from '../global';
+import { DragDropContext, Droppable } from 'react-beautiful-dnd';
+import { Alert, List, Snackbar } from '@mui/material';
 
 export interface IsReadOnly {
   [k: string]: boolean;
@@ -33,7 +35,7 @@ export function Admin() {
     group: 1,
   });
   const [isReadOnly, setIsReadOnly] = useState<IsReadOnly>({});
-  const [selectedId, setSelectedId] = useState('');
+  const [isSneckbarOpen, setIsSnackbarOpen] = useState(false);
   const [isFormNameCorrect, setIsFormNameCorrect] = useState(true);
   const [formIdError, setFormIdError] = useState('');
 
@@ -47,12 +49,36 @@ export function Admin() {
     });
   }, []);
 
+  function onDragEnd(result: any) {
+    const { destination, source, draggableId } = result;
+    if (!destination) {
+      return;
+    }
+    if (
+      destination.droppableId === source.droppableId &&
+      destination.index === source.index
+    ) {
+      return;
+    }
+
+    const chartsListMod = structuredClone(chartsList);
+    const [draggedItem] = chartsListMod.splice(source.index, 1);
+    chartsListMod.splice(destination.index, 0, draggedItem);
+    setChartsList(chartsListMod);
+
+    if (isSneckbarOpen) {
+      return;
+    } else {
+      setIsSnackbarOpen(true);
+    }
+  }
+
   return (
     <>
       <Container>
         <Typography
-          component='h1'
-          variant='h4'
+          component="h1"
+          variant="h4"
           paddingTop={5}
           paddingBottom={5}
         >
@@ -88,8 +114,8 @@ export function Admin() {
           >
             <TextField
               required
-              id='formName'
-              label='Нзавание объекта'
+              id="formName"
+              label="Нзавание объекта"
               sx={{
                 mr: 1,
                 flexGrow: 1,
@@ -104,8 +130,8 @@ export function Admin() {
             />
             <TextField
               required
-              id='formId'
-              label='ID объекта'
+              id="formId"
+              label="ID объекта"
               sx={{ mr: 1 }}
               // defaultValue='Default Value'
               error={Boolean(formIdError)}
@@ -118,9 +144,9 @@ export function Admin() {
             />
             <TextField
               required
-              id='groupN'
-              label='Группа №'
-              type='number'
+              id="groupN"
+              label="Группа №"
+              type="number"
               inputProps={{ min: '1', max: '10' }}
               sx={{ mr: 1 }}
               // defaultValue='Default Value'
@@ -135,22 +161,54 @@ export function Admin() {
                 setFormIdError('');
               }}
             />
-            <Button type='submit' variant='contained' sx={{ height: 55 }}>
+            <Button type="submit" variant="contained" sx={{ height: 55 }}>
               <KeyboardReturnIcon />
             </Button>
           </Paper>
         </Box>
-        {chartsList.map(({ name, id }) => (
-          <ChartListItem
-            key={id}
-            id={id}
-            name={name}
-            chartsList={chartsList}
-            setChartsList={setChartsList}
-            // isReadOnly={isReadOnly}
-            // handleMenuClick={handleMenuClick}
-          />
-        ))}
+        <DragDropContext onDragEnd={onDragEnd}>
+          <Droppable droppableId="droppableId">
+            {(provided) => (
+              <List ref={provided.innerRef} {...provided.droppableProps}>
+                {chartsList.map(({ name, id }, index) => (
+                  <ChartListItem
+                    key={id}
+                    id={id}
+                    index={index}
+                    name={name}
+                    chartsList={chartsList}
+                    setChartsList={setChartsList}
+                    // isReadOnly={isReadOnly}
+                    // handleMenuClick={handleMenuClick}
+                  />
+                ))}
+                {provided.placeholder}
+              </List>
+            )}
+          </Droppable>
+        </DragDropContext>
+        <Snackbar
+          open={isSneckbarOpen}
+          // autoHideDuration={6000}
+          onClose={() => {
+            setIsSnackbarOpen(false);
+          }}
+          message="Порядок графиков изменен"
+          action={
+            <>
+              <Button
+                variant="contained"
+                color="success"
+                onClick={() => {
+                  updChartsList(chartsList);
+                  setIsSnackbarOpen(false);
+                }}
+              >
+                Сохранить
+              </Button>
+            </>
+          }
+        ></Snackbar>
       </Container>
     </>
   );

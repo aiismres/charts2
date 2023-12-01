@@ -15,9 +15,13 @@ import KeyboardReturnIcon from '@mui/icons-material/KeyboardReturn';
 import { produce } from 'immer';
 import { updChartsList } from '../fetchapi/fetchapi';
 import { ChartItem } from '../global';
+import { List } from '@mui/material';
+import { Draggable } from 'react-beautiful-dnd';
+import DragIndicatorIcon from '@mui/icons-material/DragIndicator';
 
 interface Props {
   id: string;
+  index: number;
   name: string;
   chartsList: ChartItem[];
   setChartsList: Dispatch<SetStateAction<ChartItem[]>>;
@@ -30,6 +34,7 @@ interface Props {
 
 export function ChartListItem({
   id,
+  index,
   name,
   chartsList,
   setChartsList,
@@ -53,122 +58,132 @@ Props) {
   };
 
   return (
-    <>
-      <Paper
-        // key={id}
-        elevation={3}
-        sx={{
-          display: 'flex',
-          alignItems: 'center',
-          marginBottom: 2,
-          // padding: 1,
-          borderRadius: 2,
-        }}
-      >
-        {/* <Typography sx={{ flexGrow: 1, padding: 2 }}>{name}</Typography> */}
-        <InputBase
-          sx={{ ml: 2, flexGrow: 1 }}
-          // placeholder='Search Google Maps'
-          // inputProps={{ 'aria-label': 'search google maps' }}
-          // defaultValue={name}
-          readOnly={isReadOnly}
-          value={chartsList.find((item) => item.id === id)?.name}
-          onChange={(e) =>
-            setChartsList(
-              produce((draft) => {
-                let chartItem = draft.find((item) => item.id === id)!;
-                chartItem.name = e.target.value;
-              })
-            )
-          }
-        />
-        <Divider orientation='vertical' variant='middle' flexItem />
-        {/* <Typography sx={{ width: 180, padding: 2 }}>{id}</Typography> */}
-        <InputBase
-          sx={{ ml: 2 }}
-          readOnly={true}
-          value={chartsList.find((item) => item.id === id)?.id}
-          // onChange={(e) =>
-          //   setChartsList(
-          //     produce((draft) => {
-          //       let chartItem = draft.find((item) => item.id === id)!;
-          //       chartItem.id = e.target.value;
-          //     })
-          //   )
-          // }
-        />
-        <Divider orientation='vertical' variant='middle' flexItem />
-        <InputBase
-          sx={{ ml: 2, width: 30 }}
-          readOnly={isReadOnly}
-          value={chartsList.find((item) => item.id === id)?.group}
-          onChange={(e) =>
-            setChartsList(
-              produce((draft) => {
-                let chartItem = draft.find((item) => item.id === id)!;
-                chartItem.group = Number(e.target.value);
-              })
-            )
-          }
-        />
-        <Divider orientation='vertical' variant='middle' flexItem />
-        {isReadOnly ? (
-          <IconButton
-            onClick={(e) => {
-              handleMenuClick(e, id);
-            }}
-          >
-            <MoreVertIcon sx={{ width: 30 }} />
-          </IconButton>
-        ) : (
-          <IconButton
-            onClick={(e) => {
-              setIsReadOnly(true);
-              updChartsList(chartsList);
-            }}
-          >
-            <KeyboardReturnIcon sx={{ width: 30 }} />
-          </IconButton>
-        )}
-      </Paper>
-      <Menu
-        id='basic-menu'
-        anchorEl={anchorEl}
-        open={isMenuOpen}
-        onClose={handleCloseMenu}
-        MenuListProps={{
-          'aria-labelledby': 'basic-button',
-        }}
-      >
-        <MenuItem
-          onClick={() => {
-            handleCloseMenu();
-            setIsReadOnly(false);
-          }}
+    <Draggable draggableId={id} index={index}>
+      {(provided) => (
+        <List
+          ref={provided.innerRef}
+          {...provided.draggableProps}
+          {...provided.dragHandleProps}
         >
-          <ListItemIcon>
-            <EditIcon />
-          </ListItemIcon>
-          Редактировать
-        </MenuItem>
+          <Paper
+            // key={id}
+            elevation={3}
+            sx={{
+              display: 'flex',
+              alignItems: 'center',
+              pl: 0.5,
+              // marginBottom: 2,
+              // padding: 1,
+              borderRadius: 2,
+            }}
+          >
+            {/* <Typography sx={{ flexGrow: 1, padding: 2 }}>{name}</Typography> */}
+            <DragIndicatorIcon />
+            <InputBase
+              sx={{ flexGrow: 1 }}
+              // placeholder='Search Google Maps'
+              // inputProps={{ 'aria-label': 'search google maps' }}
+              // defaultValue={name}
+              readOnly={isReadOnly}
+              value={chartsList.find((item) => item.id === id)?.name}
+              onChange={(e) =>
+                setChartsList(
+                  produce((draft) => {
+                    let chartItem = draft.find((item) => item.id === id)!;
+                    chartItem.name = e.target.value;
+                  })
+                )
+              }
+            />
+            <Divider orientation="vertical" variant="middle" flexItem />
+            {/* <Typography sx={{ width: 180, padding: 2 }}>{id}</Typography> */}
+            <InputBase
+              sx={{ ml: 2 }}
+              readOnly={true}
+              value={chartsList.find((item) => item.id === id)?.id}
+              // onChange={(e) =>
+              //   setChartsList(
+              //     produce((draft) => {
+              //       let chartItem = draft.find((item) => item.id === id)!;
+              //       chartItem.id = e.target.value;
+              //     })
+              //   )
+              // }
+            />
+            <Divider orientation="vertical" variant="middle" flexItem />
+            <InputBase
+              sx={{ ml: 2, width: 30 }}
+              readOnly={isReadOnly}
+              value={chartsList.find((item) => item.id === id)?.group}
+              onChange={(e) =>
+                setChartsList(
+                  produce((draft) => {
+                    let chartItem = draft.find((item) => item.id === id)!;
+                    chartItem.group = Number(e.target.value);
+                  })
+                )
+              }
+            />
+            <Divider orientation="vertical" variant="middle" flexItem />
+            {isReadOnly ? (
+              <IconButton
+                onClick={(e) => {
+                  handleMenuClick(e, id);
+                }}
+              >
+                <MoreVertIcon sx={{ width: 30 }} />
+              </IconButton>
+            ) : (
+              <IconButton
+                onClick={(e) => {
+                  setIsReadOnly(true);
+                  updChartsList(chartsList);
+                }}
+              >
+                <KeyboardReturnIcon sx={{ width: 30 }} />
+              </IconButton>
+            )}
+          </Paper>
+          <Menu
+            id="basic-menu"
+            anchorEl={anchorEl}
+            open={isMenuOpen}
+            onClose={handleCloseMenu}
+            MenuListProps={{
+              'aria-labelledby': 'basic-button',
+            }}
+          >
+            <MenuItem
+              onClick={() => {
+                handleCloseMenu();
+                setIsReadOnly(false);
+              }}
+            >
+              <ListItemIcon>
+                <EditIcon />
+              </ListItemIcon>
+              Редактировать
+            </MenuItem>
 
-        <MenuItem
-          onClick={(e) => {
-            console.log(e.target);
-            handleCloseMenu();
-            setChartsList((st) => {
-              const newChartsList = st.filter((item) => item.id !== id);
-              updChartsList(newChartsList);
-              return newChartsList;
-            });
-          }}
-        >
-          <ListItemIcon>
-            <DeleteIcon />
-          </ListItemIcon>
-          Удалить
-        </MenuItem>
-      </Menu>
-    </>
+            <MenuItem
+              onClick={(e) => {
+                console.log(e.target);
+                handleCloseMenu();
+                setChartsList((st) => {
+                  const newChartsList = st.filter((item) => item.id !== id);
+                  updChartsList(newChartsList);
+                  return newChartsList;
+                });
+              }}
+            >
+              <ListItemIcon>
+                <DeleteIcon />
+              </ListItemIcon>
+              Удалить
+            </MenuItem>
+          </Menu>
+        </List>
+      )}
+    </Draggable>
   );
 }
