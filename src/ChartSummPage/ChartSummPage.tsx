@@ -46,7 +46,7 @@ export function ChartSummPage() {
 
   useEffect(() => {
     const timer = setInterval(() => {
-      navigate('/chartsgroup');
+      navigate('/charts2');
     }, GRAPH_INTERVAL);
     // clearing interval
     return () => clearInterval(timer);
@@ -115,17 +115,17 @@ export function ChartSummPage() {
             }}
             key={chartName.nameCh1}
           > */}
-        <Typography variant='h4' align='center'>
+        <Typography variant="h4" align="center">
           Суммарный график
         </Typography>
         {/* </CSSTransition>
         </SwitchTransition> */}
 
-        <ResponsiveContainer width='100%' height={800}>
+        <ResponsiveContainer width="100%" height={800}>
           <BarChart width={1780} height={800} data={chartData1}>
-            <Bar dataKey='v' fill='#8884d8' />
-            <YAxis type='number' domain={[0, 'auto']} />
-            <XAxis dataKey='date' ticks={xAxisData} dx={57} />
+            <Bar dataKey="v" fill="#8884d8" />
+            <YAxis type="number" domain={[0, 'auto']} />
+            <XAxis dataKey="date" ticks={xAxisData} dx={57} />
             <CartesianGrid />
           </BarChart>
         </ResponsiveContainer>
