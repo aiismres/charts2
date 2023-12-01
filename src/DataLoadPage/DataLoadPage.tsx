@@ -68,6 +68,12 @@ export function DataLoadPage() {
           <a href='/charts2'>Графики</a>
         </li>
         <li>
+          <a href='/chartsumm'>Суммарный</a>
+        </li>
+        <li>
+          <a href='/chartsgroup'>Групповые</a>
+        </li>
+        <li>
           <a href='/admin'>Админка</a>
         </li>
         <li>
