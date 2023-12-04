@@ -187,25 +187,25 @@ export function Charts2Page() {
       {/* <Typography variant='h4' align='center'>
           {chartName.nameCh1}
         </Typography> */}
-      <SwitchTransition mode='out-in'>
+      <SwitchTransition mode="out-in">
         <CSSTransition
-          classNames='fade'
+          classNames="fade"
           addEndListener={(node, done) => {
             node.addEventListener('transitionend', done, false);
           }}
           key={chartName.nameCh1}
         >
-          <Typography variant='h4' align='center' minHeight={40}>
+          <Typography variant="h4" align="center" minHeight={40}>
             {chartName.nameCh1}
           </Typography>
         </CSSTransition>
       </SwitchTransition>
 
-      <ResponsiveContainer width='100%' height={400}>
+      <ResponsiveContainer width="100%" height={400}>
         <BarChart width={1780} height={400} data={chartData1}>
-          <Bar dataKey='v' fill='#8884d8' />
+          <Bar dataKey="v" fill="#8884d8" />
           <YAxis
-            type='number'
+            type="number"
             domain={[0, 'auto']}
             tickFormatter={(tick) => {
               return tick.toLocaleString();
@@ -216,31 +216,40 @@ export function Charts2Page() {
               // fontFamily: 'Arial',
             }}
           />
-          <XAxis dataKey='date' ticks={xAxisData} dx={57} />
+          <XAxis dataKey="date" ticks={xAxisData} dx={57} />
           <CartesianGrid />
         </BarChart>
       </ResponsiveContainer>
       <br />
-      <SwitchTransition mode='out-in'>
+      <SwitchTransition mode="out-in">
         <CSSTransition
-          classNames='fade'
+          classNames="fade"
           addEndListener={(node, done) => {
             node.addEventListener('transitionend', done, false);
           }}
           key={chartName.nameCh2}
         >
-          <Typography variant='h4' align='center' minHeight={40}>
+          <Typography variant="h4" align="center" minHeight={40}>
             {chartName.nameCh2}
           </Typography>
         </CSSTransition>
       </SwitchTransition>
 
       {/* <ResponsiveContainer width='100%' height='100%'> */}
-      <ResponsiveContainer width='100%' height={400}>
+      <ResponsiveContainer width="100%" height={400}>
         <BarChart width={1780} height={400} data={chartData2}>
-          <Bar dataKey='v' fill='red' />
-          <YAxis type='number' domain={[0, 'auto']} />
-          <XAxis dataKey='date' ticks={xAxisData} dx={57} />
+          <Bar dataKey="v" fill="red" />
+          <YAxis
+            type="number"
+            domain={[0, 'auto']}
+            tickFormatter={(tick) => {
+              return tick.toLocaleString();
+            }}
+            style={{
+              fontSize: TICK_FONT_SIZE,
+            }}
+          />
+          <XAxis dataKey="date" ticks={xAxisData} dx={57} />
           <CartesianGrid />
         </BarChart>
       </ResponsiveContainer>
