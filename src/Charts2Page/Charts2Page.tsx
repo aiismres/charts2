@@ -248,7 +248,7 @@ export function Charts2Page() {
           data={chartData2}
           margin={{ left: 20 }}
         >
-          <Bar dataKey="v" fill="red" />
+          <Bar dataKey="v" fill="#FF8080" />
           <YAxis
             type="number"
             domain={[0, 'auto']}
