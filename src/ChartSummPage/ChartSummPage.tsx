@@ -18,7 +18,7 @@ import Box from '@mui/material/Box';
 import Fade from '@mui/material/Fade';
 import { SwitchTransition, CSSTransition } from 'react-transition-group';
 import { useNavigate } from 'react-router-dom';
-import { GRAPH_INTERVAL } from '../globalConst';
+import { GRAPH_INTERVAL, TICK_FONT_SIZE } from '../globalConst';
 import { StatusBlock } from '../StatusBlock';
 
 interface ChartData {
@@ -106,7 +106,8 @@ export function ChartSummPage() {
 
   return (
     <>
-      <Box paddingTop={5}>
+      {/* <Box paddingTop={5}> */}
+      <Box paddingRight={5} paddingTop={5}>
         {/* <SwitchTransition mode='out-in'>
           <CSSTransition
             classNames='fade'
@@ -121,10 +122,25 @@ export function ChartSummPage() {
         {/* </CSSTransition>
         </SwitchTransition> */}
 
-        <ResponsiveContainer width="100%" height={800}>
-          <BarChart width={1780} height={800} data={chartData1}>
+        <ResponsiveContainer width="100%" height={850}>
+          <BarChart
+            width={1780}
+            height={850}
+            data={chartData1}
+            margin={{ left: 50 }}
+          >
             <Bar dataKey="v" fill="#8884d8" />
-            <YAxis type="number" domain={[0, 'auto']} />
+            <YAxis
+              type="number"
+              domain={[0, 'auto']}
+              tickFormatter={(tick) => {
+                return tick.toLocaleString();
+              }}
+              style={{
+                // fontSize: TICK_FONT_SIZE,
+                fontSize: TICK_FONT_SIZE,
+              }}
+            />
             <XAxis dataKey="date" ticks={xAxisData} dx={57} />
             <CartesianGrid />
           </BarChart>

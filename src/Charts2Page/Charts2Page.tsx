@@ -202,7 +202,12 @@ export function Charts2Page() {
       </SwitchTransition>
 
       <ResponsiveContainer width="100%" height={400}>
-        <BarChart width={1780} height={400} data={chartData1}>
+        <BarChart
+          width={1780}
+          height={400}
+          data={chartData1}
+          margin={{ left: 20 }}
+        >
           <Bar dataKey="v" fill="#8884d8" />
           <YAxis
             type="number"
@@ -237,7 +242,12 @@ export function Charts2Page() {
 
       {/* <ResponsiveContainer width='100%' height='100%'> */}
       <ResponsiveContainer width="100%" height={400}>
-        <BarChart width={1780} height={400} data={chartData2}>
+        <BarChart
+          width={1780}
+          height={400}
+          data={chartData2}
+          margin={{ left: 20 }}
+        >
           <Bar dataKey="v" fill="red" />
           <YAxis
             type="number"
