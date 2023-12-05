@@ -59,6 +59,40 @@ export function Charts2Page() {
     }
     console.log('charsList', charsList);
     setChartsList(charsList);
+
+    // experiment 2023.12.05 ************************
+    const dateArr: string[] = [];
+    for (let i = 0; i < 15; i++) {
+      dateArr.push(
+        dayjs()
+          .hour(0)
+          .minute(0)
+          .second(0)
+          .millisecond(0)
+          .add(-14 + i, 'day')
+          .format('DD.MM.YY')
+      );
+    }
+    console.log({ dateArr });
+    setXAxisData(dateArr);
+
+    let chartDataCache: Array<ChartData[]> = JSON.parse(
+      localStorage.getItem('chartDataCache') || '[]'
+    );
+
+    console.log({ chartDataCache });
+    if (chartDataCache[0]) {
+      setChartData1(addDate(chartDataCache[chartN], dateArr));
+    }
+    if (chartDataCache[1]) {
+      setChartData2(addDate(chartDataCache[chartN + 1], dateArr));
+    }
+    setChartName((st) => ({
+      ...st,
+      nameCh1: chartsList[chartN]?.name,
+      nameCh2: chartsList[chartN + 1]?.name,
+    }));
+    // end  experiment 2023.12.05  ************************
   }, []);
 
   useEffect(() => {
