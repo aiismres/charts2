@@ -1,4 +1,4 @@
-import React, { useEffect, useLayoutEffect, useState } from 'react';
+import React, { useEffect, useLayoutEffect, useRef, useState } from 'react';
 import styles from './charts.module.css';
 import {
   LineChart,
@@ -37,6 +37,8 @@ export function Charts2Page() {
   const [chartsList, setChartsList] = useState<ChartItem[]>([]);
   const [chartN, setChartN] = useState(0);
   const [chartName, setChartName] = useState({ nameCh1: '', nameCh2: '' });
+  const chartDataRef1 = useRef<ChartData[]>([]);
+  const chartDataRef2 = useRef<ChartData[]>([]);
   // const [isFetchFinish, setIsFetchFinish] = useState(false);
   // const [isServerError, setIsServerError] = useState(false);
   const [isServerRes, setIsServerRes] = useState(true);
@@ -59,46 +61,6 @@ export function Charts2Page() {
     }
     console.log('charsList', charsList);
     setChartsList(charsList);
-
-    // experiment 2023.12.05 ************************
-    const dateArr: string[] = [];
-    for (let i = 0; i < 15; i++) {
-      dateArr.push(
-        dayjs()
-          .hour(0)
-          .minute(0)
-          .second(0)
-          .millisecond(0)
-          .add(-14 + i, 'day')
-          .format('DD.MM.YY')
-      );
-    }
-    console.log({ dateArr });
-    setXAxisData(dateArr);
-
-    let chartDataCache: Array<ChartData[]> = JSON.parse(
-      localStorage.getItem('chartDataCache') || '[]'
-    );
-
-    console.log({ chartDataCache });
-    if (chartDataCache[0]) {
-      const x1 = addDate(chartDataCache[chartN], dateArr);
-      console.log('x1: ', x1);
-      setChartData1(x1);
-    }
-    if (chartDataCache[1]) {
-      const x2 = addDate(chartDataCache[chartN + 1], dateArr);
-      console.log('x2: ', x2);
-
-      setChartData2(x2);
-    }
-
-    setChartName((st) => ({
-      ...st,
-      nameCh1: chartsList[chartN]?.name,
-      nameCh2: chartsList[chartN + 1]?.name,
-    }));
-    // end  experiment 2023.12.05  ************************
   }, []);
 
   useEffect(() => {
@@ -154,9 +116,11 @@ export function Charts2Page() {
 
     console.log({ chartDataCache });
     if (chartDataCache[chartN]) {
+      chartDataRef1.current = addDate(chartDataCache[chartN], dateArr);
       setChartData1(addDate(chartDataCache[chartN], dateArr));
     }
     if (chartDataCache[chartN + 1]) {
+      chartDataRef2.current = addDate(chartDataCache[chartN + 1], dateArr);
       setChartData2(addDate(chartDataCache[chartN + 1], dateArr));
     }
     setChartName((st) => ({
@@ -245,7 +209,8 @@ export function Charts2Page() {
         <BarChart
           width={1780}
           height={400}
-          data={chartData1}
+          // data={chartData1}
+          data={chartDataRef1.current}
           margin={{ left: 20 }}
         >
           <Bar dataKey="v" fill="#8884d8" />
@@ -285,7 +250,8 @@ export function Charts2Page() {
         <BarChart
           width={1780}
           height={400}
-          data={chartData2}
+          // data={chartData2}
+          data={chartDataRef2.current}
           margin={{ left: 20 }}
         >
           <Bar dataKey="v" fill="#FF8080" />
