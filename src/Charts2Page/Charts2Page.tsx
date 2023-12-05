@@ -82,11 +82,17 @@ export function Charts2Page() {
 
     console.log({ chartDataCache });
     if (chartDataCache[0]) {
-      setChartData1(addDate(chartDataCache[chartN], dateArr));
+      const x1 = addDate(chartDataCache[chartN], dateArr);
+      console.log('x1: ', x1);
+      setChartData1(x1);
     }
     if (chartDataCache[1]) {
-      setChartData2(addDate(chartDataCache[chartN + 1], dateArr));
+      const x2 = addDate(chartDataCache[chartN + 1], dateArr);
+      console.log('x2: ', x2);
+
+      setChartData2(x2);
     }
+
     setChartName((st) => ({
       ...st,
       nameCh1: chartsList[chartN]?.name,
