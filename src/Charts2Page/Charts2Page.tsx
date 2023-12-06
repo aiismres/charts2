@@ -28,7 +28,7 @@ export function Charts2Page() {
   const [chartData1, setChartData1] = useState<ChartData[]>([]);
   const [chartData2, setChartData2] = useState<ChartData[]>([]);
   const [xAxisData, setXAxisData] = useState<string[]>([]);
-  const [chartsList, setChartsList] = useState<ChartItem[]>([]);
+  // const [chartsList, setChartsList] = useState<ChartItem[]>([]);
   const [chartN, setChartN] = useState(0);
   const [chartName, setChartName] = useState({ nameCh1: '', nameCh2: '' });
   const chartDataRef1 = useRef<ChartData[]>([]);
@@ -38,31 +38,32 @@ export function Charts2Page() {
   const [isServerRes, setIsServerRes] = useState(true);
   const navigate = useNavigate();
 
-  useLayoutEffect(() => {
-    const charsList = JSON.parse(
+  // useLayoutEffect(() => {
+  //   const charsList = JSON.parse(
+  //     localStorage.getItem('chartListCache') || '[]'
+  //   );
+  //   if (!charsList[0]) {
+  //     window.location.replace('/');
+  //   }
+  //   console.log('charsList', charsList);
+  //   setChartsList(charsList);
+  // }, []);
+
+  useEffect(() => {
+    chartsListRef.current = JSON.parse(
       localStorage.getItem('chartListCache') || '[]'
     );
-    if (!charsList[0]) {
+    if (!chartsListRef.current[0]) {
       window.location.replace('/');
     }
-    console.log('charsList', charsList);
-    setChartsList(charsList);
-  }, []);
+    console.log('charsList', chartsListRef.current);
 
-  useEffect(() => {
-    console.log(' readChartsList().then');
-    readChartsList().then((res) => {
-      console.log(res);
-      localStorage.setItem('chartListCache', JSON.stringify(res));
-    });
-  }, []);
-
-  useEffect(() => {
     const timer = setInterval(() => {
-      console.log('setInterval', chartsList);
-
-      if (chartsList[chartN + 2]) {
-        console.log('if (chartsList[chartN + 2])', chartsList[chartN + 2]);
+      if (chartsListRef.current[chartN + 2]) {
+        console.log(
+          'if (chartsList[chartN + 2])',
+          chartsListRef.current[chartN + 2]
+        );
         setChartN((n) => n + 2);
       } else {
         console.log('else');
@@ -71,7 +72,7 @@ export function Charts2Page() {
     }, GRAPH_INTERVAL);
 
     return () => clearInterval(timer);
-  }, [chartsList, chartN]);
+  }, [chartN]);
 
   useEffect(() => {
     const dateArr: string[] = [];
@@ -104,13 +105,13 @@ export function Charts2Page() {
     }
     setChartName((st) => ({
       ...st,
-      nameCh1: chartsList[chartN]?.name,
-      nameCh2: chartsList[chartN + 1]?.name,
+      nameCh1: chartsListRef.current[chartN]?.name,
+      nameCh2: chartsListRef.current[chartN + 1]?.name,
     }));
 
     Promise.all([
-      getChartData(chartsList[chartN]?.id),
-      getChartData(chartsList[chartN + 1]?.id),
+      getChartData(chartsListRef.current[chartN]?.id),
+      getChartData(chartsListRef.current[chartN + 1]?.id),
     ])
       .then((res) => {
         console.log('asdf', res);
@@ -131,7 +132,12 @@ export function Charts2Page() {
           JSON.stringify('server needs care')
         );
       });
-  }, [chartsList, chartN]);
+
+    readChartsList().then((res) => {
+      console.log(res);
+      localStorage.setItem('chartListCache', JSON.stringify(res));
+    });
+  }, [chartN]);
 
   function addDate(arr: ChartData[], dateArr2: string[]) {
     return arr.map((item, i) => {
