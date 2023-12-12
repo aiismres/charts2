@@ -8,21 +8,24 @@ import {
 import { ChartData } from '../Charts2Page';
 import { Res, makeSummArr } from '../ChartSummPage';
 import { GroupObj } from '../ChartsGroupPage';
+import { routes } from '../App';
+import { useChartListStore } from '../zustand/store';
 // import styles from './dataloadpage.css';
 
-interface ChartsList {
+export interface ChartsList {
   id: string;
   name: string;
   group: number;
 }
 
 export function DataLoadPage() {
+  const setChartsList = useChartListStore((state) => state.setChartList);
   (async () => {
     // chartListCache *******************************
     const chartsList: ChartsList[] = await readChartsList();
     console.log(chartsList);
     localStorage.setItem('chartListCache', JSON.stringify(chartsList));
-
+    setChartsList(chartsList);
     // chartDataCache *******************************
     const chartsData: Array<ChartData[]> = [];
     for await (let chart of chartsList) {
@@ -65,19 +68,22 @@ export function DataLoadPage() {
       <h2>Загрузка данных и карта сайта</h2>
       <ul>
         <li>
-          <a href='/charts2'>Графики</a>
+          <a href={routes.charts2}>Графики</a>
         </li>
         <li>
-          <a href='/chartsumm'>Суммарный</a>
+          <a href="/chartsumm">Суммарный</a>
         </li>
         <li>
-          <a href='/chartsgroup'>Групповые</a>
+          <a href="/chartsgroup">Групповые</a>
         </li>
         <li>
-          <a href='/admin'>Админка</a>
+          <a href={routes.admin}>Админка</a>
         </li>
         <li>
-          <a href='/chartvertbar'>Вертикальные</a>
+          <a href={routes.adminGroup}>Админка группировка графиков</a>
+        </li>
+        <li>
+          <a href="/chartvertbar">Вертикальные</a>
         </li>
       </ul>
     </>
