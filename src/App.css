@@ -36,3 +36,9 @@
     transform: rotate(360deg);
   }
 }
+
+.MuiMasonry-root {
+  width: 100%;
+}
+
+/* .MuiMasonry-root { margin: 0!important; } */

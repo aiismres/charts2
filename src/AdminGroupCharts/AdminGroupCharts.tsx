@@ -6,19 +6,20 @@ import { ChartGroupList } from '../ChartGroupList';
 import { DragDropContext } from 'react-beautiful-dnd';
 import { AddChartGroupForm } from '../AddChartGroupForm';
 import { ChartsList } from '../DataLoadPage';
+import Masonry from '@mui/lab/Masonry';
 // import styles from './admingroupcharts.css';
 
 export interface ChartGroup {
   groupN: number;
   name: string;
-  // chartsId: string[];
+  chartsId: string[];
 }
 
 export function AdminGroupCharts() {
   const [newChartGroup, setNewChartGroup] = useState<ChartGroup>({
     groupN: 1,
     name: '',
-    // chartsId: [],
+    chartsId: [],
   });
 
   const chartList = useChartListStore((state) => state.chartList);
@@ -61,28 +62,27 @@ export function AdminGroupCharts() {
         <AddChartGroupForm />
 
         <DragDropContext onDragEnd={onDragEnd}>
-          <List
-            sx={{
-              display: 'grid',
-              gridTemplateColumns: '1fr 1fr',
-              // gridAutoRows: '500px',
-              // gridAutoFlow: 'column dense',
-              // gridTemplateColumns: '1fr 1fr',
-              // gridAutoFlow: '2 2 / 40px 40px 1fr '
-              // gridTemplateRows: 'repeat(1, 1fr)',
-              // gap: 1,
-              // gridTemplateRows: 'auto',
-              gridTemplateAreas: `"gra1 gra2 "
-                                  "gra1 gra3"
-                                  "gra1 gra4 "
-                                  "gra1 gra5"
-                                  "gra1 gra6 "`,
-            }}
+          <Masonry
+            columns={2}
+            spacing={5}
+            sx={{ margin: 0 }}
+            // sx={{
+            //   display: 'grid',
+            //   // gridTemplateColumns: '1fr 1fr',
+            //   // gridTemplateAreas: `"gra1 gra2"
+            //   //                     "gra1 gra3"
+            //   //                     "gra1 gra4"
+            //   //                     "gra1 gra5"
+            //   //                     "gra1 gra6"`,
+            //   gridTemplateColumns: 'repeat(3, 200px)',
+            //   // gridTemplateRows: 'repeat(3, 500px)',
+            //   // gridAutoFlow: ' dense',
+            // }}
           >
             {chartGroups.map((chg) => (
               <ChartGroupList chartGroupData={chg} />
             ))}
-          </List>
+          </Masonry>
         </DragDropContext>
       </Container>
     </>

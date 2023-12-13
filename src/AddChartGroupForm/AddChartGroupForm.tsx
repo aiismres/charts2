@@ -8,7 +8,7 @@ export function AddChartGroupForm() {
   const [newChartGroup, setNewChartGroup] = useState<ChartGroup>({
     groupN: 1,
     name: '',
-    // chartsId: [],
+    chartsId: [],
   });
   const addChartsGroup = useChartListStore((state) => state.addChartGroup);
 
@@ -22,7 +22,7 @@ export function AddChartGroupForm() {
         setNewChartGroup({
           groupN: 1,
           name: '',
-          // chartsId: [],
+          chartsId: [],
         });
       }}
     >
